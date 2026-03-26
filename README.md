@@ -1,7 +1,7 @@
 # 👨‍💻 Author
 
-Nama: Mahammad Ibadullah  
-NIM: A11.2023.15275  
+Nama: Mahammad Ibadullah
+NIM: A11.2023.15275
 
 Project ini dibuat untuk keperluan pembelajaran Docker + Django.
 
@@ -9,7 +9,7 @@ Project ini dibuat untuk keperluan pembelajaran Docker + Django.
 
 # 📚 Simple LMS - Django + PostgreSQL + Docker
 
-Project ini adalah setup dasar **Learning Management System (LMS)** menggunakan **Django**, **PostgreSQL**, dan **Docker**. Project ini dirancang untuk memudahkan development environment tanpa perlu install dependency secara manual di local machine.
+Project ini adalah setup dasar **Learning Management System (LMS)** menggunakan **Django**, **PostgreSQL**, dan **Docker**. Project ini dikembangkan hingga tahap **Database Design & ORM Implementation (Progress 2)**.
 
 ---
 
@@ -44,6 +44,14 @@ Jika berhasil, akan muncul halaman default Django 🚀
 
 ---
 
+### 4. Akses Django Admin
+
+```
+http://localhost:8000/admin
+```
+
+---
+
 # ⚙️ Environment Variables
 
 Konfigurasi environment terdapat pada file `.env`.
@@ -61,23 +69,9 @@ DB_HOST=db
 DB_PORT=5432
 ```
 
-### Penjelasan:
-
-| Variable    | Deskripsi                    |
-| ----------- | ---------------------------- |
-| DEBUG       | Mode debug Django            |
-| SECRET_KEY  | Secret key Django            |
-| DB_NAME     | Nama database PostgreSQL     |
-| DB_USER     | Username PostgreSQL          |
-| DB_PASSWORD | Password PostgreSQL          |
-| DB_HOST     | Host database (gunakan `db`) |
-| DB_PORT     | Port PostgreSQL              |
-
 ---
 
 # 🐳 Services yang Digunakan
-
-Project ini menggunakan Docker Compose dengan 2 service utama:
 
 ### 1. Web (Django)
 
@@ -103,11 +97,68 @@ simple-lms/
 ├── requirements.txt
 ├── manage.py
 ├── config/
-│   ├── __init__.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
+├── lms/
+│   ├── models.py
+│   ├── admin.py
+│   ├── managers.py
+│   ├── scripts/
+│   │   └── query_demo.py
+│   └── migrations/
 ```
+
+---
+
+# 🗄️ Data Models (Progress 2)
+
+Model yang dibuat menggunakan Django ORM:
+
+* **User** (custom user dengan role: admin, instructor, student)
+* **Category** (self-referencing hierarchy)
+* **Course** (relasi ke instructor & category)
+* **Lesson** (relasi ke course dengan ordering)
+* **Enrollment** (relasi student-course dengan unique constraint)
+* **Progress** (tracking penyelesaian lesson)
+
+---
+
+# ⚡ Query Optimization
+
+Menggunakan:
+
+* `select_related`
+* Custom QuerySet (`managers.py`)
+
+---
+
+## 🔬 Demo Query Optimization
+
+File:
+
+```
+lms/scripts/query_demo.py
+```
+
+---
+
+## 📊 Hasil Perbandingan Query
+
+```text
+=== TANPA OPTIMASI ===
+instruktur1
+Total Query: 2
+
+=== DENGAN OPTIMASI ===
+instruktur1
+Total Query: 1
+```
+
+---
+
+## 🧠 Penjelasan
+
+Tanpa optimasi, Django mengalami **N+1 problem**, yaitu setiap relasi memicu query tambahan.
+
+Dengan `select_related`, Django melakukan JOIN sehingga hanya menggunakan **1 query**.
 
 ---
 
@@ -116,6 +167,7 @@ simple-lms/
 ### Migrasi Database
 
 ```bash
+docker compose exec web python manage.py makemigrations
 docker compose exec web python manage.py migrate
 ```
 
@@ -163,8 +215,6 @@ docker compose down
 
 # 📂 Static Files
 
-Konfigurasi static files di `settings.py`:
-
 ```python
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -176,32 +226,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 ### ❌ Tidak bisa konek ke database
 
-✔ Pastikan:
+Gunakan:
 
 ```env
 DB_HOST=db
 ```
 
-**Jangan gunakan `localhost`**
-
 ---
 
-### ❌ Port sudah digunakan
+### ❌ Container error
 
 ```bash
-docker compose down
-```
-
-Atau ganti port di `docker-compose.yml`
-
----
-
-### ❌ Container error / tidak jalan
-
-Cek:
-
-```bash
-docker ps
 docker logs lms_web
 ```
 
@@ -209,28 +244,59 @@ docker logs lms_web
 
 ### ❌ Perubahan tidak muncul
 
-Coba rebuild:
-
 ```bash
 docker compose up --build
 ```
 
 ---
 
-# 📸 Screenshot (WAJIB)
+# 📸 Screenshot
 
-Tambahkan screenshot berikut:
+## Progress 1
 
-1. Halaman Django (`localhost:8000`)
-2. Container berjalan (`docker ps`)
+### Tampilan awal Django
 
-Contoh:
+![Tampilan awal Django](images/image1.png)
 
-```
-docs/
-├── home.png
-├── docker.png
-```
+### Succes Setup and Instalasi
+
+![Succes Setup and Instalasi](images/image3.png)
+
+### Migration and create super user
+
+![migration and creat super user](images/image2.png)
+
+---
+
+## Progress 2
+
+### Makemigrations & Migrate
+
+![Makemigrations](images/image4.png)
+
+---
+
+### Super Admin Login Dashboard
+
+![Admin Dashboard](images/image5.png)
+
+---
+
+### Query Optimization Comparison
+
+![Query Comparison](images/image6.png)
+
+---
+
+# 📊 Kriteria Penilaian
+
+| Kriteria           | Status |
+| ------------------ | ------ |
+| Models & Relasi    | ✅      |
+| Query Optimization | ✅      |
+| Django Admin       | ✅      |
+| Migration          | ✅      |
+| Dokumentasi Query  | ✅      |
 
 ---
 
@@ -239,7 +305,7 @@ docs/
 ```bash
 git init
 git add .
-git commit -m "Initial commit simple LMS"
+git commit -m "Simple LMS Progress 2"
 git branch -M main
 git remote add origin <repo-url>
 git push -u origin main
@@ -249,46 +315,35 @@ git push -u origin main
 
 # ✅ Checklist
 
-* [ ] Docker berhasil dijalankan
-* [ ] Django tampil di browser
-* [ ] Database PostgreSQL terhubung
-* [ ] Migrasi berhasil tanpa error
-* [ ] Struktur project sesuai
-* [ ] README lengkap
-* [ ] Screenshot tersedia
+* [x] Docker berjalan
+* [x] Django tampil
+* [x] PostgreSQL terhubung
+* [x] Migrasi berhasil
+* [x] Models & relasi selesai
+* [x] Query optimization selesai
+* [x] Django Admin berjalan
+* [x] Screenshot lengkap
 
 ---
 
-# 🎯 Catatan Penting
+# 🎯 Kesimpulan
 
-* Gunakan `.env` untuk konfigurasi
-* Jangan hardcode credential database
-* Gunakan `db` sebagai host database
-* Selalu stop container jika terjadi error
+Project berhasil mengimplementasikan:
 
----
-
-# 📌 Next Step (Pengembangan LMS)
-
-Setelah setup berhasil, kamu bisa lanjut:
-
-* Membuat app `courses`
-* Sistem user & authentication
-* Enrollment siswa
-* Upload materi
-* Quiz / assignment
+* Database design dengan Django ORM
+* Relasi kompleks antar model
+* Query optimization menggunakan `select_related`
+* Demonstrasi N+1 problem
+* Django Admin interface
+* Docker-based development
 
 ---
 
-## 📸 Screenshot
+# 📌 Next Step
 
-### Tampilan awal Django
-![Tampilan awal Django](images/image1.png)
-
-### Succes Setup and Instalasi
-![Succes Setup and Instalasi](images/image3.png)
-
-### migration and creat super user
-![migration and creat super user](images/image2.png)
+* API (Django REST Framework)
+* Frontend UI
+* Sistem course lengkap
+* Quiz & assignment
 
 ---

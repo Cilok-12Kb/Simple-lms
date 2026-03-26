@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'lms',
 ]
 
 MIDDLEWARE = [
@@ -82,6 +83,9 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT'),
     }
 }
+
+
+AUTH_USER_MODEL = 'lms.User'
 
 
 # Password validation
