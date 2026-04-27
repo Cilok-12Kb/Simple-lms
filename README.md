@@ -1,4 +1,3 @@
-````
 # 👨‍💻 Author
 
 Nama: Mahammad Ibadullah  
