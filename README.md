@@ -1,52 +1,51 @@
+````markdown
 # 👨‍💻 Author
 
-Nama: Mahammad Ibadullah
+Nama: Mahammad Ibadullah  
 NIM: A11.2023.15275
 
-Project ini dibuat untuk keperluan pembelajaran Docker + Django.
+Project ini dibuat untuk keperluan pembelajaran Docker + Django + REST API.
 
 ---
 
 # 📚 Simple LMS - Django + PostgreSQL + Docker
 
-Project ini adalah setup dasar **Learning Management System (LMS)** menggunakan **Django**, **PostgreSQL**, dan **Docker**. Project ini dikembangkan hingga tahap **Database Design & ORM Implementation (Progress 2)**.
+Project ini adalah setup dasar **Learning Management System (LMS)** menggunakan **Django**, **PostgreSQL**, dan **Docker**.
+
+Project ini telah dikembangkan hingga tahap **Progress 3: REST API & Authentication System** menggunakan **Django Ninja**, **JWT Authentication**, dan **Role-Based Access Control (RBAC)**.
 
 ---
 
 # 🚀 Cara Menjalankan Project
 
-### 1. Clone Repository
+## 1. Clone Repository
 
 ```bash
 git clone <repo-url>
 cd simple-lms
-```
+````
 
----
-
-### 2. Jalankan Docker
+## 2. Jalankan Docker
 
 ```bash
 docker compose up --build
 ```
 
----
+## 3. Akses Aplikasi
 
-### 3. Akses Aplikasi
-
-Buka browser:
-
-```
+```text
 http://localhost:8000
 ```
 
-Jika berhasil, akan muncul halaman default Django 🚀
+## 4. API Documentation (Swagger)
 
----
-
-### 4. Akses Django Admin
-
+```text
+http://localhost:8000/api/docs
 ```
+
+## 5. Django Admin
+
+```text
 http://localhost:8000/admin
 ```
 
@@ -54,7 +53,7 @@ http://localhost:8000/admin
 
 # ⚙️ Environment Variables
 
-Konfigurasi environment terdapat pada file `.env`.
+Konfigurasi environment terdapat pada file `.env`
 
 Contoh:
 
@@ -73,131 +72,285 @@ DB_PORT=5432
 
 # 🐳 Services yang Digunakan
 
-### 1. Web (Django)
+## 1. Web (Django)
 
 * Menjalankan aplikasi Django
-* Port: `8000`
+* Port `8000`
 
-### 2. Database (PostgreSQL)
+## 2. Database (PostgreSQL)
 
 * Database utama
-* Port: `5432`
-* Data disimpan di volume Docker
+* Port `5432`
 
 ---
 
 # 🧱 Struktur Project
 
-```
+```text
 simple-lms/
 ├── docker-compose.yml
 ├── Dockerfile
-├── .env
-├── .env.example
 ├── requirements.txt
 ├── manage.py
 ├── config/
+├── api/
+│   ├── router.py
+│   ├── auth.py
+│   ├── auth_bearer.py
+│   ├── courses.py
+│   ├── enrollments.py
+│   ├── permissions.py
+│   ├── schemas.py
+│   └── views.py
 ├── lms/
 │   ├── models.py
 │   ├── admin.py
 │   ├── managers.py
-│   ├── scripts/
-│   │   └── query_demo.py
 │   └── migrations/
+└── images/
 ```
 
 ---
 
-# 🗄️ Data Models (Progress 2)
+# 🗄️ Data Models
 
-Model yang dibuat menggunakan Django ORM:
+Model utama menggunakan Django ORM:
 
 * **User** (custom user dengan role: admin, instructor, student)
-* **Category** (self-referencing hierarchy)
-* **Course** (relasi ke instructor & category)
-* **Lesson** (relasi ke course dengan ordering)
-* **Enrollment** (relasi student-course dengan unique constraint)
-* **Progress** (tracking penyelesaian lesson)
+* **Category** (kategori course)
+* **Course** (relasi instructor & category)
+* **Lesson** (relasi ke course)
+* **Enrollment** (student mengambil course)
+* **Progress** (tracking lesson selesai)
 
 ---
 
-# ⚡ Query Optimization
+# 🚀 Progress 3: REST API & Authentication System
 
-Menggunakan:
-
-* `select_related`
-* Custom QuerySet (`managers.py`)
+Progress ini berfokus pada pembuatan REST API lengkap menggunakan **Django Ninja**.
 
 ---
 
-## 🔬 Demo Query Optimization
+# 🎯 Learning Objectives
 
-File:
+* Membuat REST API dengan Django Ninja
+* Schema validation menggunakan Pydantic
+* JWT Authentication implementation
+* Role-Based Access Control (RBAC)
+* API documentation dengan Swagger UI
 
+---
+
+# 📦 API Endpoints
+
+# 🔐 Authentication
+
+## Register User
+
+```http
+POST /api/auth/register
 ```
-lms/scripts/query_demo.py
+
+## Login User
+
+```http
+POST /api/auth/login
+```
+
+Return:
+
+* Access Token
+* Refresh Token
+
+## Refresh Token
+
+```http
+POST /api/auth/refresh
+```
+
+## Current User
+
+```http
+GET /api/auth/me
+```
+
+## Update Profile
+
+```http
+PUT /api/auth/me
 ```
 
 ---
 
-## 📊 Hasil Perbandingan Query
+# 📚 Courses (Public)
+
+## List Courses
+
+```http
+GET /api/courses
+```
+
+Fitur:
+
+* Pagination
+* Search filter
+* Category filter
+
+## Course Detail
+
+```http
+GET /api/courses/{id}
+```
+
+---
+
+# 🛡️ Courses (Protected)
+
+## Create Course (Instructor Only)
+
+```http
+POST /api/courses
+```
+
+## Update Course (Owner Only)
+
+```http
+PATCH /api/courses/{id}
+```
+
+## Delete Course (Admin Only)
+
+```http
+DELETE /api/courses/{id}
+```
+
+---
+
+# 🎓 Enrollments
+
+## Enroll Course
+
+```http
+POST /api/enrollments
+```
+
+(Student only)
+
+## My Courses
+
+```http
+GET /api/enrollments/my-courses
+```
+
+## Mark Progress
+
+```http
+POST /api/enrollments/{id}/progress
+```
+
+---
+
+# 🔑 Authentication System
+
+Project ini menggunakan **JWT Authentication**
+
+Fitur:
+
+* Access Token
+* Refresh Token
+* Token validation middleware
+* Password hashing Django
+
+---
+
+# 👮 Permission System (RBAC)
+
+Role yang digunakan:
+
+* **Admin**
+* **Instructor**
+* **Student**
+
+Decorator permission:
+
+```python
+@is_admin
+@is_instructor
+@is_student
+```
+
+Tambahan:
+
+* Ownership validation pada update course
+* Instructor hanya dapat mengubah course miliknya
+* Admin dapat menghapus semua course
+
+---
+
+# 📐 Schema Validation (Pydantic)
+
+Semua request & response menggunakan schema Django Ninja / Pydantic:
+
+```python
+UserRegisterSchema
+LoginSchema
+CourseCreateSchema
+CourseUpdateSchema
+EnrollmentSchema
+ProgressSchema
+```
+
+---
+
+# 📘 API Documentation
+
+Swagger UI otomatis tersedia di:
 
 ```text
-=== TANPA OPTIMASI ===
-instruktur1
-Total Query: 2
+http://localhost:8000/api/docs
+```
 
-=== DENGAN OPTIMASI ===
-instruktur1
-Total Query: 1
+Digunakan untuk:
+
+* Testing endpoint langsung
+* Melihat request body schema
+* Authorization Bearer Token
+* Response documentation
+
+---
+
+# 📬 Postman Collection
+
+Disediakan collection Postman untuk testing endpoint:
+
+```text
+Simple-LMS.postman_collection.json
 ```
 
 ---
 
-## 🧠 Penjelasan
+# 🛠️ Perintah Penting
 
-Tanpa optimasi, Django mengalami **N+1 problem**, yaitu setiap relasi memicu query tambahan.
-
-Dengan `select_related`, Django melakukan JOIN sehingga hanya menggunakan **1 query**.
-
----
-
-# 🗄️ Perintah Penting
-
-### Migrasi Database
+## Migration
 
 ```bash
 docker compose exec web python manage.py makemigrations
 docker compose exec web python manage.py migrate
 ```
 
----
-
-### Membuat Superuser
+## Create Superuser
 
 ```bash
 docker compose exec web python manage.py createsuperuser
 ```
 
----
-
-### Masuk ke Container
+## Masuk Container
 
 ```bash
 docker compose exec web bash
 ```
 
----
-
-### Melihat Container Aktif
-
-```bash
-docker ps
-```
-
----
-
-### Melihat Log
+## Lihat Logs
 
 ```bash
 docker logs lms_web
@@ -205,26 +358,9 @@ docker logs lms_web
 
 ---
 
-### Stop Project
-
-```bash
-docker compose down
-```
-
----
-
-# 📂 Static Files
-
-```python
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-```
-
----
-
 # ⚠️ Troubleshooting
 
-### ❌ Tidak bisa konek ke database
+## Database tidak connect
 
 Gunakan:
 
@@ -232,9 +368,13 @@ Gunakan:
 DB_HOST=db
 ```
 
----
+## Perubahan tidak muncul
 
-### ❌ Container error
+```bash
+docker compose up --build
+```
+
+## Container error
 
 ```bash
 docker logs lms_web
@@ -242,73 +382,100 @@ docker logs lms_web
 
 ---
 
-### ❌ Perubahan tidak muncul
+# 📸 Screenshot Bukti Progress
 
-```bash
-docker compose up --build
+# Progress 1
+
+## Tampilan Awal Django
+
+```md
+![Tampilan Awal](images/image1.png)
+```
+
+## Setup Berhasil
+
+```md
+![Setup Success](images/image3.png)
+```
+
+## Migration & Superuser
+
+```md
+![Migration](images/image2.png)
 ```
 
 ---
 
-# 📸 Screenshot
+# Progress 2
 
-## Progress 1
+## Makemigrations & Migrate
 
-### Tampilan awal Django
+```md
+![Migrate](images/image4.png)
+```
 
-![Tampilan awal Django](images/image1.png)
+## Admin Dashboard
 
-### Succes Setup and Instalasi
-
-![Succes Setup and Instalasi](images/image3.png)
-
-### Migration and create super user
-
-![migration and creat super user](images/image2.png)
-
----
-
-## Progress 2
-
-### Makemigrations & Migrate
-
-![Makemigrations](images/image4.png)
-
----
-
-### Super Admin Login Dashboard
-
+```md
 ![Admin Dashboard](images/image5.png)
+```
+
+## Query Optimization
+
+```md
+![Query Compare](images/image6.png)
+```
 
 ---
 
-### Query Optimization Comparison
+# Progress 3
 
-![Query Comparison](images/image6.png)
+## Swagger Documentation
 
----
+```md
+![Swagger Docs](images/image7.1.png)
+```
 
-# 📊 Kriteria Penilaian
+## Register API Success
 
-| Kriteria           | Status |
-| ------------------ | ------ |
-| Models & Relasi    | ✅      |
-| Query Optimization | ✅      |
-| Django Admin       | ✅      |
-| Migration          | ✅      |
-| Dokumentasi Query  | ✅      |
+```md
+![Register](images/image7.2.png)
+```
 
----
+## Login JWT Token
 
-# 📤 Cara Upload ke GitHub
+```md
+![Login JWT](images/image7.3.png)
+```
 
-```bash
-git init
-git add .
-git commit -m "Simple LMS Progress 2"
-git branch -M main
-git remote add origin <repo-url>
-git push -u origin main
+## Get Current User
+
+```md
+![Current User](images/image7.4.png)
+```
+
+## Course Endpoint
+
+```md
+![Course API](images/image7.5.png)
+```
+
+## Enrollment Endpoint
+
+```md
+![Enrollment API](images/image7.6.png)
+```
+
+## Protected Endpoint JWT
+
+```md
+![JWT Protected](images/image7.7.png)
+```
+
+## Postman Testing
+
+```md
+![Postman](images/image7.8.png)
 ```
 
 ---
@@ -318,32 +485,38 @@ git push -u origin main
 * [x] Docker berjalan
 * [x] Django tampil
 * [x] PostgreSQL terhubung
-* [x] Migrasi berhasil
-* [x] Models & relasi selesai
-* [x] Query optimization selesai
-* [x] Django Admin berjalan
+* [x] Models selesai
+* [x] REST API selesai
+* [x] JWT Authentication selesai
+* [x] RBAC selesai
+* [x] Swagger UI aktif
+* [x] Postman collection tersedia
 * [x] Screenshot lengkap
 
 ---
 
 # 🎯 Kesimpulan
 
-Project berhasil mengimplementasikan:
+Project **Simple LMS Progress 3** berhasil mengimplementasikan:
 
-* Database design dengan Django ORM
-* Relasi kompleks antar model
-* Query optimization menggunakan `select_related`
-* Demonstrasi N+1 problem
-* Django Admin interface
-* Docker-based development
+* Django Ninja REST API
+* JWT Authentication
+* Refresh Token System
+* Role-Based Access Control
+* Schema Validation dengan Pydantic
+* Swagger API Documentation
+* Postman Testing Collection
+* Docker-based development system
 
 ---
 
 # 📌 Next Step
 
-* API (Django REST Framework)
-* Frontend UI
-* Sistem course lengkap
-* Quiz & assignment
+* Upload file materi course
+* Quiz & Assignment API
+* Payment system
+* Frontend React / Next.js
+* Deploy ke VPS / Cloud
 
----
+```
+```

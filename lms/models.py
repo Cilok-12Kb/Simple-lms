@@ -41,7 +41,13 @@ class Course(models.Model):
         return self.title
     
     objects = CourseQuerySet.as_manager()
-    
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['instructor'], name='idx_course_instructor'),
+            models.Index(fields=['category'], name='idx_course_category'),
+        ]
+
 class Lesson(models.Model):
     course = models.ForeignKey(
         Course,
